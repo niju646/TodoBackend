@@ -12,7 +12,7 @@ app.use(cors());
 app.use(express.json());
 app.use("/api/todos/public", userRoutes);
 app.use("/api/todos", auth, todoRoutes);
-PORT = 3000 || process.env.PORT
+const PORT = process.env.PORT || 3000;
 
 sequelize.sync()
     .then(() => {
