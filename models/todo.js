@@ -10,6 +10,9 @@ const Todo = sequelize.define("Todo", {
         type: DataTypes.STRING,
         allowNull: false,
     },
+    deadline: {
+        type: DataTypes.DATE,
+    },
     description: {
         type: DataTypes.TEXT,
     },

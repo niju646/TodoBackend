@@ -1,0 +1,9 @@
+{
+    "development": {
+        "username": "tododb_5slg_user",
+        "password": "8w2D632uRx34RP2nxdODlgsHlVxladSo",
+        "database": "tododb_5slg",
+        "host": "dpg-d6k4jdh5pdvs739mvfig-a",
+        "dialect": "postgres"
+    }
+}

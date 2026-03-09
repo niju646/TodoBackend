@@ -4,7 +4,7 @@ const Todo = require("../models/todo");
 const createTodo = async (req, res) => {
     try {
         const user_id = req.user.id;
-        const { title, description } = req.body;
+        const { title, description, deadline } = req.body;
         if (!title || !description) {
             return res.status(400).json({ message: "All fields are required" });
         }
@@ -18,7 +18,7 @@ const createTodo = async (req, res) => {
         if (existingTodo) {
             return res.status(400).json({ error: "Todo already exists" });
         }
-        const todo = await Todo.create({ title, description, user_id: user_id });
+        const todo = await Todo.create({ title, description, user_id: user_id, deadline: deadline });
         res.status(201).json({
             message: "Todo created successfully",
             data: todo,
@@ -83,7 +83,7 @@ const getTodoById = async (req, res) => {
 // UPDATE
 const updateTodo = async (req, res) => {
     try {
-        const { title, description, status } = req.body;
+        const { title, description, status, deadline } = req.body;
         const user_id = req.user.id;
         const todo = await Todo.findOne({
             where: {
@@ -94,7 +94,7 @@ const updateTodo = async (req, res) => {
         if (!todo) {
             return res.status(404).json({ message: "Todo not found" });
         }
-        await todo.update({ title, description, status });
+        await todo.update({ title, description, status, deadline });
         res.json({
             message: "Todo updated successfully",
             data: todo,

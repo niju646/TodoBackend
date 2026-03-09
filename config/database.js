@@ -11,6 +11,9 @@
 // );
 
 // module.exports = sequelize;
+
+
+//postgres
 const { Sequelize } = require("sequelize");
 
 const sequelize = new Sequelize(
