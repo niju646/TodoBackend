@@ -5,5 +5,15 @@
         "database": "tododb_5slg",
         "host": "dpg-d6k4jdh5pdvs739mvfig-a",
         "dialect": "postgres"
+    },
+    "production": {
+        "use_env_variable": "DATABASE_URL",
+        "dialect": "postgres",
+        "dialectOptions": {
+            "ssl": {
+                "require": true,
+                "rejectUnauthorized": false
+            }
+        }
     }
 }
