@@ -20,6 +20,10 @@ const Todo = sequelize.define("Todo", {
         type: DataTypes.BOOLEAN,
         defaultValue: false,
     },
+    category_id: {
+        type: DataTypes.INTEGER,
+        allowNull: false,
+    },
 }, {
     timestamps: true,
 });

@@ -1,10 +1,10 @@
-const Todo = require("../models/todo");
+const { Todo, Category } = require("../models");
 
 // CREATE
 const createTodo = async (req, res) => {
     try {
         const user_id = req.user.id;
-        const { title, description, deadline } = req.body;
+        const { title, description, deadline, category_id } = req.body;
         if (!title || !description) {
             return res.status(400).json({ message: "All fields are required" });
         }
@@ -12,13 +12,13 @@ const createTodo = async (req, res) => {
             where: {
                 user_id: user_id,
                 title: title,
-                description: description,
+                category_id: category_id,
             },
         });
         if (existingTodo) {
             return res.status(400).json({ error: "Todo already exists" });
         }
-        const todo = await Todo.create({ title, description, user_id: user_id, deadline: deadline });
+        const todo = await Todo.create({ title, description, user_id: user_id, deadline: deadline, category_id: category_id });
         res.status(201).json({
             message: "Todo created successfully",
             data: todo,
@@ -28,35 +28,85 @@ const createTodo = async (req, res) => {
     }
 };
 
-// GET ALL
+// GET ALL todos under a category
 const getAllTodos = async (req, res) => {
     try {
+
+        const { category_id } = req.params;
         const user_id = req.user.id;
+
         let { page = 1, limit = 10, status } = req.query;
+
         page = parseInt(page);
         limit = parseInt(limit);
+
         const offset = (page - 1) * limit;
+
         const whereCondition = {
             user_id: user_id
         };
+
+        if (category_id) {
+
+            const category = await Category.findOne({
+                where: {
+                    id: category_id,
+                    user_id: user_id
+                }
+            });
+
+            if (!category) {
+                return res.status(404).json({
+                    message: "Category not found"
+                });
+            }
+
+            whereCondition.category_id = category_id;
+        }
+
+        // Filter by status
         if (status) {
             whereCondition.status = status;
         }
+
         const { count, rows } = await Todo.findAndCountAll({
             where: whereCondition,
             limit: limit,
             offset: offset,
             order: [["createdAt", "DESC"]],
+            include: [
+                {
+                    model: Category,
+                    as: "category",
+                    attributes: ["id", "name"]
+                }
+            ]
         });
-        res.json({
+
+        // If no todos exist
+        if (count === 0) {
+            return res.status(200).json({
+                message: "No todos found",
+                totalItems: 0,
+                totalPages: 0,
+                currentPage: page,
+                data: []
+            });
+        }
+
+        res.status(200).json({
             message: "Todos fetched successfully",
             totalItems: count,
             totalPages: Math.ceil(count / limit),
             currentPage: page,
-            data: rows,
+            data: rows
         });
+
     } catch (error) {
-        res.status(500).json({ error: error.message });
+        console.error(error);
+        res.status(500).json({
+            error: error.message
+        });
     }
 };
 
@@ -69,7 +119,14 @@ const getTodoById = async (req, res) => {
             where: {
                 id: id,
                 user_id: user_id
-            }
+            },
+            include: [
+                {
+                    model: Category,
+                    as: "category",
+                    attributes: ["id", "name"],
+                },
+            ],
         })
         if (!todo) {
             return res.status(404).json({ message: "Todo not found" });
@@ -83,18 +140,25 @@ const getTodoById = async (req, res) => {
 // UPDATE
 const updateTodo = async (req, res) => {
     try {
-        const { title, description, status, deadline } = req.body;
+        const { title, description, status, deadline, category_id } = req.body;
         const user_id = req.user.id;
         const todo = await Todo.findOne({
             where: {
                 id: req.params.id,
                 user_id: user_id
-            }
+            },
+            include: [
+                {
+                    model: Category,
+                    as: "category",
+                    attributes: ["id", "name"],
+                },
+            ],
         })
         if (!todo) {
             return res.status(404).json({ message: "Todo not found" });
         }
-        await todo.update({ title, description, status, deadline });
+        await todo.update({ title, description, status, deadline, category_id });
         res.json({
             message: "Todo updated successfully",
             data: todo,
