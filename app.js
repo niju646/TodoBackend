@@ -14,7 +14,7 @@ app.use("/api/todos/public", userRoutes);
 app.use("/api/todos", auth, todoRoutes);
 const PORT = process.env.PORT || 3000;
 
-sequelize.sync({ alter: true })
+sequelize.sync()
     .then(() => {
         console.log("Database connected & synced");
         app.listen(PORT, () => {

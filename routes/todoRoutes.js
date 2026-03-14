@@ -12,6 +12,7 @@ router.put("/updateStatus/:id", todoController.updateStatus);
 router.get("/totalTodos", todoController.totalTodos);
 router.get("/totalCompletedTodos", todoController.totalCompletedTodos);
 router.get("/pendingCount", todoController.pendingCount);
+router.get("/getAllTodosForUser", todoController.getAllTodosForUser);
 
 //create category
 router.post("/createCategory", categoryController.createCategory);

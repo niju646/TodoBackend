@@ -28,6 +28,31 @@ const createTodo = async (req, res) => {
     }
 };
 
+//get all todos for a user
+const getAllTodosForUser = async (req, res) => {
+    try {
+        const user_id = req.user.id;
+        const todos = await Todo.findAll({
+            where: {
+                user_id: user_id
+            },
+            include: [
+                {
+                    model: Category,
+                    as: "category",
+                    attributes: ["id", "name"]
+                }
+            ]
+        });
+        res.json({
+            message: "Todos fetched successfully",
+            data: todos,
+        });
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+}
+
 // GET ALL todos under a category
 const getAllTodos = async (req, res) => {
     try {
@@ -279,4 +304,5 @@ module.exports = {
     totalTodos,
     totalCompletedTodos,
     pendingCount,
+    getAllTodosForUser,
 };
